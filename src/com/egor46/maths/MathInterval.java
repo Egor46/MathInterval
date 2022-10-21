@@ -2,7 +2,7 @@ package com.egor46.maths;
 
 public class MathInterval {
 
-    public float intervalStart, intervalEnd;
+    public double intervalStart, intervalEnd;
     public char startSymbol, endSymbol;
 
 
@@ -20,14 +20,44 @@ public class MathInterval {
             default:
                 this.startSymbol = start_end[0].charAt(0);
                 this.intervalStart = Float.parseFloat(start_end[0].substring(1));
-                this.endSymbol = start_end[1].charAt(start_end[1].length()-1);
-                this.intervalEnd = Float.parseFloat(start_end[1].substring(0, start_end[1].length()-1));
     } switch (start_end[1]) {
             case "-oo": throw new ArithmeticException();
+            case "oo": this.intervalEnd = Float.POSITIVE_INFINITY;
+            default:
+                this.endSymbol = start_end[1].charAt(start_end[1].length()-1);
+                this.intervalEnd = Float.parseFloat(start_end[1].substring(0, start_end[1].length()-1));
         }
     }
+    private MathInterval(char startSymbol, double intervalStart, double intervalEnd, char endSymbol){
+        this.intervalEnd = intervalEnd;
+        this.intervalStart = intervalStart;
+        this.startSymbol = startSymbol;
+        this.endSymbol = endSymbol;
+    }
 
-    public void printSetBorders() {
-        System.out.println(String.format("%c%f;%f%c",startSymbol,intervalStart,intervalEnd,endSymbol));
+    public void printIntervalBorders() {
+        System.out.printf("%c%f;%f%c%n",startSymbol,intervalStart,intervalEnd,endSymbol);
+    }
+
+    public double leftEndpoint(){
+        return intervalStart;
+    }
+
+    public double rightEndpoint(){
+        return intervalEnd;
+    }
+
+    public static MathInterval unite(MathInterval interval1, MathInterval interval2){
+        double int1Start = interval1.leftEndpoint(), int2Start = interval2.leftEndpoint();
+        double int1End = interval1.rightEndpoint(), int2End = interval2.rightEndpoint();
+        char int1S = interval1.startSymbol, int2S = interval2.startSymbol,
+                int1E = interval1.endSymbol, int2E = interval2.endSymbol;
+        char startS,endS;
+        double maxEnd,minStart;
+        maxEnd = Math.max(int1End, int2End);
+        minStart = Math.min(int1Start, int2Start);
+        endS = int1End > int2End ? int1E : int2E;
+        startS = int1Start < int2Start ? int1S : int2S;
+        return new MathInterval(startS, minStart,maxEnd,endS);
     }
 }
